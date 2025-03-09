@@ -5,9 +5,15 @@
         "src": "finance_tracker/wsgi.py",
         "use": "@vercel/python",
         "config": { "maxLambdaSize": "15mb",
-                    "runtime": "python3.10",
-                    "buildCommand": "setup.sh" 
+                    "runtime": "python3.10"
                   }
+      },
+      {
+        "src": "setup.sh",
+        "use": "@vercel/static-build",
+        "config": { 
+          "distDir": "finance_tracker/staticfiles" 
+        }
       }
     ],
     "routes": [
