@@ -19,11 +19,5 @@
         "src": "/(.*)",
         "dest": "finance_traker/wsgi.py"
       }
-    ],
-    "rewrites":[
-      {
-        "source": "/(.*)",
-        "destination": "/"
-      }
     ]
   }
