@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-3xl font-bold text-gray-900">{{ account_book.name }}</h1>
+        </div>
+        <p class="text-gray-600">{{ account_book.description }}</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                    <i class="fas fa-arrow-down text-green-600"></i>
+                </div>
+                <div class="ml-5">
+                    <h3 class="text-sm font-medium text-gray-500">Total Income</h3>
+                    <p class="text-2xl font-semibold text-gray-900">${{ income }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
+                    <i class="fas fa-arrow-up text-red-600"></i>
+                </div>
+                <div class="ml-5">
+                    <h3 class="text-sm font-medium text-gray-500">Total Expenses</h3>
+                    <p class="text-2xl font-semibold text-gray-900">${{ expenses }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                    <i class="fas fa-wallet text-blue-600"></i>
+                </div>
+                <div class="ml-5">
+                    <h3 class="text-sm font-medium text-gray-500">Balance</h3>
+                    <p class="text-2xl font-semibold text-gray-900">${{ balance }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="bg-white rounded-lg shadow mb-8">
+        <div class="p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Monthly Trend</h3>
+            <canvas id="monthlyTrendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Transactions List -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Recent Transactions</h3>
+                <a href="{% url 'add_transaction' account_book.id %}"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Add Transaction
+                </a>
+            </div>
+            
+            {% if transactions %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.date }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.get_type_display }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.category }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+                                ${{ transaction.amount }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.description }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-center py-4">No transactions found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Parse JSON data from Django context
+    const dailyData = JSON.parse('{{ daily_data_json|safe }}');
+
+    // Extract labels (full dates) and values for Chart.js
+    const labels = dailyData.map(d => d.date);
+    const incomeData = dailyData.map(d => d.total_income || 0);
+    const expenseData = dailyData.map(d => d.total_expenses || 0);
+
+    // Create the chart
+    new Chart(document.getElementById('monthlyTrendChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Income',
+                data: incomeData,
+                borderColor: '#10B981',
+                backgroundColor: '#10B98120',
+                tension: 0.1,
+                fill: true
+            }, {
+                label: 'Expenses',
+                data: expenseData,
+                borderColor: '#EF4444',
+                backgroundColor: '#EF444420',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

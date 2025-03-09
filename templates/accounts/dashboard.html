@@ -1,0 +1,67 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Your Account Books</h1>
+        <a href="{% url 'create_account_book' %}"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            Create New Book
+        </a>
+    </div>
+
+    {% if books_data %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for book_data in books_data %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2">{{ book_data.book.name }}</h3>
+                <p class="text-gray-600 mb-4">{{ book_data.book.description }}</p>
+                <div class="mt-4 space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Income:</span>
+                        <span class="text-green-600">${{ book_data.income|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Expenses:</span>
+                        <span class="text-red-600">${{ book_data.expenses|floatformat:2 }}</span>
+                    </div>
+                    <div class="flex justify-between font-semibold">
+                        <span>Balance:</span>
+                        <span class="{% if book_data.balance >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            ${{ book_data.balance|floatformat:2 }}
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-between items-center">
+                    <span class="text-sm text-gray-500">Created: {{ book_data.book.created_at|date:"M d, Y" }}</span>
+                    <a href="{% url 'account_book_detail' book_data.book.id %}"
+                        class="text-indigo-600 hover:text-indigo-800 font-medium">View Details →</a>
+                </div>
+                <div class="mt-6 flex justify-between items-center">
+                    <a href="{% url 'delete_account_book' book_data.book.id %}" 
+                    class="flex-1 text-center border border-red-600 text-red-600 px-4 py-2 rounded hover:bg-red-50 transition" 
+                    onclick="return confirm('Are you sure you want to delete this book?');">
+                    Delete Book
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <div class="mb-4">
+            <i class="fas fa-book text-4xl text-gray-400"></i>
+        </div>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">No Account Books Yet</h3>
+        <p class="text-gray-600 mb-4">Create your first account book to start tracking your finances.</p>
+        <a href="{% url 'create_account_book' %}"
+            class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+            Create First Book
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
