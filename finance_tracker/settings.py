@@ -32,7 +32,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    ".vercel.app",
+    # ".vercel.app",
 ]
 
 
@@ -89,7 +89,7 @@ DATABASES = {
         "USER": config("DB_USER"),
         "HOST": config("DB_HOST"),
         "PASSWORD": config("DB_PASSWORD"),
-        "PORT": config("DB_PORT"),
+        "PORT": config("DB_PORT")
     }
 }
 
