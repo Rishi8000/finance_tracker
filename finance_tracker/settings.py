@@ -15,6 +15,8 @@ from pathlib import Path
 
 from decouple import config
 
+import dj_database_url
+
 # import dj_database_url
 # from decouple import config
 
@@ -31,9 +33,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    ".vercel.app",
-]
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 
 # Application definition
@@ -93,7 +93,7 @@ DATABASES = {
     }
 }
 
-# DATABASES['default'] = dj_database_url.config()
+DATABASES['default'] = dj_database_url.parse(config("DB_URL"))
 
 
 # Password validation
